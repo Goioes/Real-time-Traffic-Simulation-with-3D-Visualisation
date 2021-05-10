@@ -1,0 +1,2 @@
+C:\Users\gielo\OneDrive\Documenten\Arbeit\RealDeal\Unity\DarraghMag97\Real-time-Traffic-Simulation-with-3D-Visualisation\DarraghMag97Unity\obj\Debug\Assembly-CSharp-Editor.csprojAssemblyReference.cache
+C:\Users\gielo\OneDrive\Documenten\Arbeit\RealDeal\Unity\DarraghMag97\Real-time-Traffic-Simulation-with-3D-Visualisation\DarraghMag97Unity\obj\Debug\Assembly-CSharp-Editor.csproj.CoreCompileInputs.cache
