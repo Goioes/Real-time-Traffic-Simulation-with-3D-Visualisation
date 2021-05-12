@@ -6,7 +6,7 @@ using CodingConnected.TraCI.NET.Types;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using RunPythonScript;
+//using RunPythonScript;
 
 using System.IO;
 using System.Linq;
@@ -33,18 +33,19 @@ public class Traci_one : MonoBehaviour
     public Dictionary<string, List<traLights>> dicti;
 
     public PauseMenu pauseMenu;
-
+    public RunPythonScript runPython = new RunPythonScript();
     private void Awake()
     {
-        RunPython runPython = new RunPython();
         runPython.CreateChildThread();
+        Thread.Sleep(3000);
     }
     // Start is called before the first frame update
     void Start()
     {
         client = new TraCIClient();
         client.Connect("127.0.0.1", SceneSwap.sceneSwap.remotePort); //connects to SUMO simulation
-       
+        client.Control.SetOrder(1);
+
         tlightids = client.TrafficLight.GetIdList().Content; //all traffic light IDs in the simulation
         client.Gui.TrackVehicle("View #0", "0");
         client.Gui.SetZoom("View #0", 1200); //tracking the player vehicle
@@ -69,6 +70,7 @@ public class Traci_one : MonoBehaviour
     private void OnApplicationQuit()
     {
         client.Control.Close();//terminates the connection upon ending of the scene
+        runPython.KillProcess();
     }
 
     // Update is called once per frame

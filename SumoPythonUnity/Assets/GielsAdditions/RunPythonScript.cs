@@ -1,81 +1,100 @@
 ﻿using System;
-using System.Diagnostics;
+using System.Collections;
+//using System.Diagnostics;
+using UnityEngine;
 using System.IO;
 using System.Threading;
+using System.Diagnostics;
+using CodingConnected.TraCI.NET;
 
-namespace RunPythonScript
+public class RunPythonScript 
 {
-    public class RunPython
-    {
-        public static Thread mainThread; //Traci
-        public static Thread childThread; //Runs sumo
-        private static string filePythonExePath = @"C:/Users/gielo/anaconda3/envs/Python3_7/python.exe";
-        private static string filePythonNamePath = "C://Users//gielo//OneDrive//Documenten//Arbeit//RealDeal//Unity//TestCSCode//BasicRunSumo.py";
-        private static string netPath = "--netfile C:/Users/gielo/OneDrive/Documenten/Arbeit/RealDeal/Unity/TestCSCode/grid.net.xml ";
-        private static string cfgPath = "--cfgfile C:/Users/gielo/OneDrive/Documenten/Arbeit/RealDeal/Unity/TestCSCode/grid.sumocfg ";
-        private static string port = "--port 4001";
-        private static string filePythonParameterName = netPath + cfgPath + port;
-        public void CreateChildThread()  // Main creates child thread
-        {
-            mainThread = Thread.CurrentThread;
-            mainThread.Name = "MainThread";
-            ThreadStart childref = new ThreadStart(CallToChildThread);
-            Console.WriteLine("In Main: Creating the Child thread");
-            childThread = new Thread(childref);
-            childThread.Name = "ChildThread";
-            //childThread.IsBackground = true;
-            childThread.Start();
-        }
-        public static void CallToChildThread() // Child thread
-        {
-            Console.WriteLine("Child thread starts");
-            string fileNameParameter = $"{filePythonNamePath} {filePythonParameterName}";
-            ExecutePythonScript(fileNameParameter);
-        }
+    private static string filePythonExePath = @"C:/Users/20210124/Anaconda/python.exe";
+    public string filePythonNamePath = "C://Users//20210124//Documents//RealDeal//Unity//Real-time-Traffic-Simulation-with-3D-Visualisation//SumoSimulation//BasicRunSumo.py ";
+    public string netPath = "--netfile C:/Users/20210124//Documents/RealDeal/Unity/Real-time-Traffic-Simulation-with-3D-Visualisation/SumoSimulation/map.net.xml ";
+    public string cfgPath = "--cfgfile C:/Users/20210124//Documents/RealDeal/Unity/Real-time-Traffic-Simulation-with-3D-Visualisation/SumoSimulation/map.sumocfg ";
+    public int portNumber = 4001;
 
-        private static System.Text.StringBuilder outputText = null;
-        private static int lineCount = 0;
-        
-        public static void ExecutePythonScript(string fileNameParameter)
+    public static Thread mainThread; //Runs Unity
+    public static Thread childThread; //Runs python 
+    public static RunPythonScript runPython;
+    public Process pythonProcess = new Process();
+    public TraCIClient client;
+
+    //public void Test()
+    //{
+    //    mainThread = Thread.CurrentThread;
+    //    CreateChildThread();
+
+    //    UnityEngine.Debug.Log("Done");
+    //}
+
+    //public void Stop()
+    //{
+    //    runPython.pythonProcess.Kill();
+    //}
+    public void CreateChildThread()  // Main creates child thread
+    {
+        UnityEngine.Debug.Log("In Main: Creating the Child thread");
+        Thread childThread = new Thread(ExecutePythonScript);
+        childThread.Name = "ChildThread";
+        childThread.Start();
+    }
+
+    public void KillProcess()
+    {
+        runPython.pythonProcess.Kill();
+    }
+
+    private static System.Text.StringBuilder outputText = null;
+    private static int lineCount = 0;
+
+    public void ExecutePythonScript()
+    {
+
+        string port = "--port " + portNumber;
+        string filePythonParameterName = netPath + cfgPath + port;
+        UnityEngine.Debug.Log(filePythonParameterName);
+        UnityEngine.Debug.Log(filePythonNamePath);
+        string fileNameParameter = $"{filePythonNamePath + filePythonParameterName}";
+        runPython = this;
+        outputText = new System.Text.StringBuilder();
+        string standardError = string.Empty;
+        try
         {
-            outputText = new System.Text.StringBuilder();
-            string standardError = string.Empty;
-            try
+            using (runPython.pythonProcess)
             {
-                using (Process process = new Process())
+                UnityEngine.Debug.Log(filePythonExePath);
+                UnityEngine.Debug.Log(fileNameParameter);
+                pythonProcess.StartInfo = new ProcessStartInfo(filePythonExePath)
                 {
-                    process.StartInfo = new ProcessStartInfo(filePythonExePath)
-                    {
-                        Arguments = fileNameParameter,
-                        UseShellExecute = false,
-                        RedirectStandardOutput = true,
-                        //RedirectStandardError = true,
-                        CreateNoWindow = true
-                    };
-                    process.OutputDataReceived += new DataReceivedEventHandler((sender, e) =>
-                    {
+                    Arguments = fileNameParameter,
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    //RedirectStandardError = true,
+                    CreateNoWindow = true
+                };
+                pythonProcess.OutputDataReceived += new DataReceivedEventHandler((sender, e) =>
+                {
                         // Prepend line numbers to each line of the output.
                         if (!String.IsNullOrEmpty(e.Data))
-                        {
-                            lineCount++;
-                            outputText.Append("\n[" + lineCount + "]: " + e.Data);
-                            Console.WriteLine(e.Data);
-                        }
-                    });
-                    process.Start();
-                    process.BeginOutputReadLine();
-                    Console.WriteLine(outputText);
-                    Console.WriteLine("Error");
-                    Thread.Sleep(6000);
-                    process.Kill();
-                    process.WaitForExit();
-                    Console.WriteLine(outputText);
-                }
+                    {
+                        lineCount++;
+                        outputText.Append("\n[" + lineCount + "]: " + e.Data);
+                        UnityEngine.Debug.Log(e.Data);
+                    }
+                });
+                pythonProcess.Start();
+                pythonProcess.BeginOutputReadLine();
+                UnityEngine.Debug.Log(outputText);
+                UnityEngine.Debug.Log("Error");
+                Thread.Sleep(6000);
+                pythonProcess.WaitForExit();
             }
-            catch (Exception ex)
-            {
-                string exceptionMessage = ex.Message;
-            }
+        }
+        catch
+        {
+            UnityEngine.Debug.Log("Could not start python!");
         }
     }
 }

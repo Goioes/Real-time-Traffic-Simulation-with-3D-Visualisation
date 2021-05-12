@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+//using RunPythonScript;
 
 public class PauseMenu : MonoBehaviour{
 
     public bool gameIsPaused = false;
     public GameObject pauseMenuUI;
+    public RunPythonScript runPython;
 
     public void checkPause() {
         Debug.Log("update frame");
@@ -47,10 +49,12 @@ public class PauseMenu : MonoBehaviour{
     public void restartGame()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        runPython.KillProcess();
     }
     public void quitGame()
     {
         Debug.Log("Quit");
+        runPython.KillProcess();
         Application.Quit();
     }
 }

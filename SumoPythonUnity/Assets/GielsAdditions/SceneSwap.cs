@@ -17,8 +17,8 @@ public class SceneSwap : MonoBehaviour {
         {
             sceneSwap = this;
 
-            // set defaults:
-            scenarioPath = @"C:\Users\gielo\OneDrive\Documenten\Arbeit\RealDeal\Unity\DarraghMag97\Real-time-Traffic-Simulation-with-3D-Visualisation\SumoSimulation\map.sumocfg";
+        // set defaults:
+            scenarioPath = @"C:\Users\20210124\Documents\RealDeal\Unity\Real-time-Traffic-Simulation-with-3D-Visualisation\SumoSimulation\map.sumocfg";
             remotePort = 4001;
             stepLength = 0.02;
             SceneManager.LoadSceneAsync(1, LoadSceneMode.Additive);
